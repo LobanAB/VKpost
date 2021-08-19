@@ -18,7 +18,7 @@ def fetch_image_xkcd(image_dir=''):
 def save_image(image_url: str, target_path: Path):
     image_name = image_url.split('/')[-1]
     Path(target_path).mkdir(parents=True, exist_ok=True)
-    filename = target_path.joinpath(f'{image_name}')
+    filename = target_path.joinpath(image_name)
     response = requests.get(image_url, verify=False)
     response.raise_for_status()
     with open(filename, 'wb') as file:
