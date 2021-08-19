@@ -6,14 +6,20 @@
 
 - Скачайте код.
 - Для работы скачайте Python - https://www.python.org/.
-- Установите зависимости `pip install -r requirements.txt`.
+- Установите зависимости 
+```
+pip install -r requirements.txt
+```
 - Создайте файл .env со следующим содержимым.
 Для работы нужен ключ api Вконтакте (как получить можно узнать [тут](https://vk.com/dev/first_guide/  "vk.com")) и id группы (можно узнать [тут](https://regvk.com/id/  "regvk.com")).
 ```
 VK_ACCESS_TOKEN={api токен Вконтакте}
 VK_GROUP_ID={id группы куда будем постить}
 ```
--Запустите программу `python main.py`.
+- Запустите программу
+```
+python main.py
+```
 
 Будет скачана случайная картинка с сайта xkcd.com и размещена постом в группе Вконтакте.
 
