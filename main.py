@@ -7,12 +7,12 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-def fetch_image_xkcd(images_dir=''):
+def fetch_image_xkcd(image_dir=''):
     rand_num = random.randint(1, 2503)
     xkcd_api_url = f'https://xkcd.com/{rand_num}/info.0.json'
     response = requests.get(xkcd_api_url)
     response.raise_for_status()
-    return save_image(response.json()['img'], Path.cwd() / images_dir), response.json()['alt']
+    return save_image(response.json()['img'], Path.cwd() / image_dir), response.json()['alt']
 
 
 def save_image(image_url: str, target_path: Path):
