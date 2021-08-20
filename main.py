@@ -7,8 +7,15 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-def fetch_image_xkcd(image_dir=''):
-    rand_num = random.randint(1, 2503)
+def get_xkcd_current():
+    xkcd_api_url = 'https://xkcd.com/info.0.json'
+    response = requests.get(xkcd_api_url)
+    response.raise_for_status()
+    return response.json()['num']
+
+
+def fetch_image_xkcd(xkcd_current, image_dir=''):
+    rand_num = random.randint(1, xkcd_current)
     xkcd_api_url = f'https://xkcd.com/{rand_num}/info.0.json'
     response = requests.get(xkcd_api_url)
     response.raise_for_status()
@@ -80,7 +87,8 @@ def main():
     load_dotenv()
     vk_access_token = os.getenv('VK_ACCESS_TOKEN')
     vk_group_id = os.getenv('VK_GROUP_ID')
-    image_name, image_title = fetch_image_xkcd()
+    xkcd_current = get_xkcd_current()
+    image_name, image_title = fetch_image_xkcd(xkcd_current)
     upload_url = get_upload_url(vk_access_token, vk_group_id)
     owner_id, media_id = upload_image(vk_access_token, vk_group_id, upload_url, image_name)
     post_image(vk_access_token, vk_group_id, owner_id, media_id, image_title)
