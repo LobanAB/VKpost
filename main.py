@@ -19,7 +19,8 @@ def fetch_image_xkcd(xkcd_current, image_dir=''):
     xkcd_api_url = f'https://xkcd.com/{rand_num}/info.0.json'
     response = requests.get(xkcd_api_url)
     response.raise_for_status()
-    return save_image(response.json()['img'], Path.cwd() / image_dir), response.json()['alt']
+    response_json = response.json()
+    return save_image(response_json['img'], Path.cwd() / image_dir), response_json['alt']
 
 
 def save_image(image_url: str, target_path: Path):
@@ -45,26 +46,31 @@ def get_upload_url(vk_access_token: str, vk_group_id: str):
     return response.json()['response']['upload_url']
 
 
-def upload_image(vk_access_token, vk_group_id, upload_url, image_name):
+def upload_image(upload_url, image_name):
     with open(image_name, 'rb') as file:
         files = {
             'photo': file,
         }
         response = requests.post(upload_url, files=files)
         response.raise_for_status()
+    return response.json()
+
+
+def save_wall_image(vk_access_token, vk_group_id, response_json):
     vk_api_method = 'photos.saveWallPhoto'
     vk_api_url = f'https://api.vk.com/method/{vk_api_method}'
     payload = {'group_id': vk_group_id,
-               'photo': response.json()['photo'],
-               'server': response.json()['server'],
-               'hash': response.json()['hash'],
+               'photo': response_json['photo'],
+               'server': response_json['server'],
+               'hash': response_json['hash'],
                'access_token': vk_access_token,
                'v': '5.131'
                }
     response = requests.post(vk_api_url, params=payload)
     response.raise_for_status()
-    media_id = int(response.json()['response'][0]['id'])
-    owner_id = int(response.json()['response'][0]['owner_id'])
+    response_json = response.json()
+    media_id = int(response_json['response'][0]['id'])
+    owner_id = int(response_json['response'][0]['owner_id'])
     return owner_id, media_id
 
 
@@ -90,7 +96,8 @@ def main():
     xkcd_current = get_xkcd_current()
     image_name, image_title = fetch_image_xkcd(xkcd_current)
     upload_url = get_upload_url(vk_access_token, vk_group_id)
-    owner_id, media_id = upload_image(vk_access_token, vk_group_id, upload_url, image_name)
+    response_json = upload_image(upload_url, image_name)
+    owner_id, media_id = save_wall_image(vk_access_token, vk_group_id, response_json)
     post_image(vk_access_token, vk_group_id, owner_id, media_id, image_title)
     os.remove(image_name)
 
