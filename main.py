@@ -14,19 +14,17 @@ def get_xkcd_current():
     return response.json()['num']
 
 
-def fetch_image_xkcd(xkcd_current, image_dir=''):
+def fetch_image_xkcd(xkcd_current):
     rand_num = random.randint(1, xkcd_current)
     xkcd_api_url = f'https://xkcd.com/{rand_num}/info.0.json'
     response = requests.get(xkcd_api_url)
     response.raise_for_status()
     response_json = response.json()
-    return save_image(response_json['img'], Path.cwd() / image_dir), response_json['alt']
+    return save_image(response_json['img']), response_json['alt']
 
 
-def save_image(image_url: str, target_path: Path):
-    image_name = image_url.split('/')[-1]
-    Path(target_path).mkdir(parents=True, exist_ok=True)
-    filename = target_path.joinpath(image_name)
+def save_image(image_url: str):
+    filename = image_url.split('/')[-1]
     response = requests.get(image_url, verify=False)
     response.raise_for_status()
     with open(filename, 'wb') as file:
@@ -93,6 +91,7 @@ def main():
     load_dotenv()
     vk_access_token = os.getenv('VK_ACCESS_TOKEN')
     vk_group_id = os.getenv('VK_GROUP_ID')
+    Path(Path.cwd()).mkdir(parents=True, exist_ok=True)
     xkcd_current = get_xkcd_current()
     image_name, image_title = fetch_image_xkcd(xkcd_current)
     upload_url = get_upload_url(vk_access_token, vk_group_id)
