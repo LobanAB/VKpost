@@ -3,6 +3,7 @@ import random
 
 import requests
 from pathlib import Path
+from urllib.parse import urlparse, unquote
 
 from dotenv import load_dotenv
 
@@ -24,7 +25,7 @@ def fetch_image_xkcd(xkcd_current):
 
 
 def save_image(image_url: str):
-    filename = image_url.split('/')[-1]
+    filename = os.path.split(unquote(urlparse(image_url)[2]))[1]
     response = requests.get(image_url, verify=False)
     response.raise_for_status()
     with open(filename, 'wb') as file:
@@ -35,12 +36,16 @@ def save_image(image_url: str):
 def get_upload_url(vk_access_token: str, vk_group_id: str):
     vk_api_method = 'photos.getWallUploadServer'
     vk_api_url = f'https://api.vk.com/method/{vk_api_method}'
-    payload = {'group_id': vk_group_id,
+    payload = {'group_id': int(vk_group_id),
                'access_token': vk_access_token,
                'v': '5.131'
                }
     response = requests.post(vk_api_url, params=payload)
     response.raise_for_status()
+    response_json = response.json()
+    if 'error' in response_json:
+        raise requests.exceptions.HTTPError(response_json['error']['error_code'],
+                                            response_json['error']['error_msg'])
     return response.json()['response']['upload_url']
 
 
@@ -51,6 +56,10 @@ def upload_image(upload_url, image_name):
         }
         response = requests.post(upload_url, files=files)
         response.raise_for_status()
+        response_json = response.json()
+        if 'error' in response_json:
+            raise requests.exceptions.HTTPError(response_json['error']['error_code'],
+                                                response_json['error']['error_msg'])
     return response.json()
 
 
@@ -67,6 +76,9 @@ def save_wall_image(vk_access_token, vk_group_id, response_json):
     response = requests.post(vk_api_url, params=payload)
     response.raise_for_status()
     response_json = response.json()
+    if 'error' in response_json:
+        raise requests.exceptions.HTTPError(response_json['error']['error_code'],
+                                            response_json['error']['error_msg'])
     media_id = int(response_json['response'][0]['id'])
     owner_id = int(response_json['response'][0]['owner_id'])
     return owner_id, media_id
@@ -84,7 +96,11 @@ def post_image(vk_access_token, vk_group_id, owner_id, media_id, image_title):
                }
     vk_api_method = 'wall.post'
     vk_api_url = f'https://api.vk.com/method/{vk_api_method}'
-    requests.post(vk_api_url, params=payload)
+    response = requests.post(vk_api_url, params=payload)
+    response_json = response.json()
+    if 'error' in response_json:
+        raise requests.exceptions.HTTPError(response_json['error']['error_code'],
+                                            response_json['error']['error_msg'])
 
 
 def main():
@@ -94,11 +110,15 @@ def main():
     Path(Path.cwd()).mkdir(parents=True, exist_ok=True)
     xkcd_current = get_xkcd_current()
     image_name, image_title = fetch_image_xkcd(xkcd_current)
-    upload_url = get_upload_url(vk_access_token, vk_group_id)
-    response_json = upload_image(upload_url, image_name)
-    owner_id, media_id = save_wall_image(vk_access_token, vk_group_id, response_json)
-    post_image(vk_access_token, vk_group_id, owner_id, media_id, image_title)
-    os.remove(image_name)
+    try:
+        upload_url = get_upload_url(vk_access_token, vk_group_id)
+        response_json = upload_image(upload_url, image_name)
+        owner_id, media_id = save_wall_image(vk_access_token, vk_group_id, response_json)
+        post_image(vk_access_token, vk_group_id, owner_id, media_id, image_title)
+    except requests.exceptions.HTTPError as err:
+        print(err)
+    finally:
+        os.remove(image_name)
 
 
 if __name__ == '__main__':
