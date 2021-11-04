@@ -15,7 +15,7 @@ def get_xkcd_current():
     return response.json()['num']
 
 
-def fetch_image_xkcd(xkcd_current):
+def fetch_xkcd_image(xkcd_current):
     rand_num = random.randint(1, xkcd_current)
     xkcd_api_url = f'https://xkcd.com/{rand_num}/info.0.json'
     response = requests.get(xkcd_api_url)
@@ -109,7 +109,7 @@ def main():
     vk_group_id = os.getenv('VK_GROUP_ID')
     Path(Path.cwd()).mkdir(parents=True, exist_ok=True)
     xkcd_current = get_xkcd_current()
-    image_name, image_title = fetch_image_xkcd(xkcd_current)
+    image_name, image_title = fetch_xkcd_image(xkcd_current)
     try:
         upload_url = get_upload_url(vk_access_token, vk_group_id)
         response_json = upload_image(upload_url, image_name)
