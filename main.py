@@ -19,8 +19,8 @@ def fetch_xkcd_image(xkcd_current):
     xkcd_api_url = f'https://xkcd.com/{rand_num}/info.0.json'
     response = requests.get(xkcd_api_url)
     response.raise_for_status()
-    response_json = response.json()
-    return save_image(response_json['img']), response_json['alt']
+    response = response.json()
+    return save_image(response['img']), response['alt']
 
 
 def save_image(image_url: str):
@@ -41,9 +41,9 @@ def get_upload_url(vk_access_token: str, vk_group_id: str):
                }
     response = requests.post(vk_api_url, params=payload)
     response.raise_for_status()
-    response_json = response.json()
-    is_response_error(response_json)
-    return response_json['response']['upload_url']
+    response = response.json()
+    check_error(response)
+    return response['response']['upload_url']
 
 
 def upload_image(upload_url, image_name):
@@ -53,9 +53,9 @@ def upload_image(upload_url, image_name):
         }
         response = requests.post(upload_url, files=files)
     response.raise_for_status()
-    response_json = response.json()
-    is_response_error(response_json)
-    return response_json['photo'], response_json['server'], response_json['hash']
+    response = response.json()
+    check_error(response)
+    return response['photo'], response['server'], response['hash']
 
 
 def save_wall_image(vk_access_token, vk_group_id, response_photo, response_server, response_hash):
@@ -70,10 +70,10 @@ def save_wall_image(vk_access_token, vk_group_id, response_photo, response_serve
                }
     response = requests.post(vk_api_url, params=payload)
     response.raise_for_status()
-    response_json = response.json()
-    is_response_error(response_json)
-    media_id = int(response_json['response'][0]['id'])
-    owner_id = int(response_json['response'][0]['owner_id'])
+    response = response.json()
+    check_error(response)
+    media_id = int(response['response'][0]['id'])
+    owner_id = int(response['response'][0]['owner_id'])
     return owner_id, media_id
 
 
@@ -91,14 +91,13 @@ def post_image(vk_access_token, vk_group_id, owner_id, media_id, image_title):
     vk_api_url = f'https://api.vk.com/method/{vk_api_method}'
     response = requests.post(vk_api_url, params=payload)
     response.raise_for_status()
-    response_json = response.json()
-    is_response_error(response_json)
+    check_error(response.json())
 
 
-def is_response_error(response_json):
-    if 'error' in response_json:
-        raise requests.exceptions.HTTPError(response_json['error']['error_code'],
-                                            response_json['error']['error_msg'])
+def check_error(response):
+    if 'error' in response:
+        raise requests.exceptions.HTTPError(response['error']['error_code'],
+                                            response['error']['error_msg'])
 
 
 def main():
