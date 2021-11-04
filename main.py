@@ -43,7 +43,7 @@ def get_upload_url(vk_access_token: str, vk_group_id: str):
     response.raise_for_status()
     response_json = response.json()
     is_response_error(response_json)
-    return response.json()['response']['upload_url']
+    return response_json['response']['upload_url']
 
 
 def upload_image(upload_url, image_name):
@@ -90,6 +90,7 @@ def post_image(vk_access_token, vk_group_id, owner_id, media_id, image_title):
     vk_api_method = 'wall.post'
     vk_api_url = f'https://api.vk.com/method/{vk_api_method}'
     response = requests.post(vk_api_url, params=payload)
+    response.raise_for_status()
     response_json = response.json()
     is_response_error(response_json)
 
