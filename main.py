@@ -52,9 +52,9 @@ def upload_image(upload_url, image_name):
             'photo': file,
         }
         response = requests.post(upload_url, files=files)
-        response.raise_for_status()
-        response_json = response.json()
-        is_response_error(response_json)
+    response.raise_for_status()
+    response_json = response.json()
+    is_response_error(response_json)
     return response_json['photo'], response_json['server'], response_json['hash']
 
 
