@@ -5,13 +5,17 @@
 ## Как установить
 
 - Скачайте код.
+```
+git clone https://github.com/LobanAB/VKpost.git
+```
 - Для работы скачайте Python - https://www.python.org/.
 - Установите зависимости 
 ```
 pip install -r requirements.txt
 ```
 - Создайте файл .env со следующим содержимым.
-Для работы нужен ключ api Вконтакте (как получить можно узнать [тут](https://vk.com/dev/first_guide/  "vk.com")) и id группы (можно узнать [тут](https://regvk.com/id/  "regvk.com")).
+Для работы нужен ключ api Вконтакте (как получить можно узнать [тут](https://vk.com/dev/first_guide  "vk.com")) и id группы (можно узнать [тут](https://regvk.com/id/  "regvk.com")).
+Ключ можно получить вручную. Вам потребуются следующие права: photos, groups, wall и offline
 ```
 VK_ACCESS_TOKEN={api токен Вконтакте}
 VK_GROUP_ID={id группы куда будем постить}

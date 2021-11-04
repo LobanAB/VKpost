@@ -60,7 +60,7 @@ def upload_image(upload_url, image_name):
         if 'error' in response_json:
             raise requests.exceptions.HTTPError(response_json['error']['error_code'],
                                                 response_json['error']['error_msg'])
-    return response.json()
+    return response_json
 
 
 def save_wall_image(vk_access_token, vk_group_id, response_json):
