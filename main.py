@@ -2,7 +2,6 @@ import os
 import random
 
 import requests
-from pathlib import Path
 from urllib.parse import urlparse, unquote
 
 from dotenv import load_dotenv
@@ -107,7 +106,6 @@ def main():
     load_dotenv()
     vk_access_token = os.getenv('VK_ACCESS_TOKEN')
     vk_group_id = os.getenv('VK_GROUP_ID')
-    Path(Path.cwd()).mkdir(parents=True, exist_ok=True)
     xkcd_current = get_xkcd_current()
     image_name, image_title = fetch_xkcd_image(xkcd_current)
     try:
