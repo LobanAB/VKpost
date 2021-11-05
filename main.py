@@ -2,9 +2,8 @@ import os
 import random
 
 import requests
-from urllib.parse import urlparse, unquote
-
 from dotenv import load_dotenv
+from urllib.parse import urlparse, unquote
 
 
 def get_xkcd_current():
@@ -105,7 +104,7 @@ def main():
     vk_access_token = os.getenv('VK_ACCESS_TOKEN')
     vk_group_id = os.getenv('VK_GROUP_ID')
     xkcd_current = get_xkcd_current()
-    image_name, image_title = fetch_xkcd_image(xkcd_current)
+    image_name, image_title = fetch_xkcd_random_image(xkcd_current)
     try:
         upload_url = get_upload_url(vk_access_token, vk_group_id)
         response_photo, response_server, response_hash = upload_image(upload_url, image_name)
