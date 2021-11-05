@@ -35,7 +35,7 @@ def save_image(image_url: str):
 def get_upload_url(vk_access_token: str, vk_group_id: str):
     vk_api_method = 'photos.getWallUploadServer'
     vk_api_url = f'https://api.vk.com/method/{vk_api_method}'
-    payload = {'group_id': int(vk_group_id),
+    payload = {'group_id': vk_group_id,
                'access_token': vk_access_token,
                'v': '5.131'
                }
