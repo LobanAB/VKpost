@@ -14,7 +14,7 @@ def get_xkcd_current():
     return response.json()['num']
 
 
-def fetch_xkcd_image(xkcd_current):
+def fetch_xkcd_random_image(xkcd_current):
     rand_num = random.randint(1, xkcd_current)
     xkcd_api_url = f'https://xkcd.com/{rand_num}/info.0.json'
     response = requests.get(xkcd_api_url)
