@@ -57,13 +57,13 @@ def upload_image(upload_url, image_name):
     return response['photo'], response['server'], response['hash']
 
 
-def save_wall_image(vk_access_token, vk_group_id, response_photo, response_server, response_hash):
+def save_wall_image(vk_access_token, vk_group_id, image_data, vk_server, image_hash):
     vk_api_method = 'photos.saveWallPhoto'
     vk_api_url = f'https://api.vk.com/method/{vk_api_method}'
     payload = {'group_id': vk_group_id,
-               'photo': response_photo,
-               'server': response_server,
-               'hash': response_hash,
+               'photo': image_data,
+               'server': vk_server,
+               'hash': image_hash,
                'access_token': vk_access_token,
                'v': '5.131'
                }
@@ -107,13 +107,13 @@ def main():
     image_name, image_title = fetch_xkcd_random_image(xkcd_current)
     try:
         upload_url = get_upload_url(vk_access_token, vk_group_id)
-        response_photo, response_server, response_hash = upload_image(upload_url, image_name)
+        image_data, vk_server, image_hash = upload_image(upload_url, image_name)
         owner_id, media_id = save_wall_image(
             vk_access_token,
             vk_group_id,
-            response_photo,
-            response_server,
-            response_hash
+            image_data,
+            vk_server,
+            image_hash
         )
         post_image(vk_access_token, vk_group_id, owner_id, media_id, image_title)
     except requests.exceptions.HTTPError as err:
